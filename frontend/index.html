@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page">
+    <div class="card">
+        <h2>CONTACT FORM</h2>
+        <p class="subtitle">Contact us using the form below</p>
+
+        <!-- Success Message -->
+        <p id="successMsg" class="success-msg">
+            ✔ Form submitted successfully!
+        </p>
+
+        <form id="contactForm" novalidate>
+
+            <input type="text" name="name" placeholder="Enter your name" required>
+
+            <input type="email" name="email" id="email"
+                   placeholder="Enter your email" required>
+
+            <input type="tel" name="phone"
+                   placeholder="Enter your phone number"
+                   pattern="[0-9]{10}" required>
+
+            <input type="text" name="subject" placeholder="Subject" required>
+
+            <label class="topic-label">Topic of Inquiry:</label>
+            <select name="topic" required>
+                <option value="">-- Select Topic --</option>
+                <option>Support</option>
+                <option>Sales</option>
+                <option>Feedback</option>
+            </select>
+
+            <textarea name="message" rows="4"
+                      placeholder="Enter your message" required></textarea>
+
+            <button type="submit" id="submitBtn">
+                <span class="btn-text">Submit</span>
+                <span class="loader"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById("contactForm");
+const successMsg = document.getElementById("successMsg");
+const submitBtn = document.getElementById("submitBtn");
+const emailInput = document.getElementById("email");
+
+/* LIVE EMAIL VALIDATION */
+emailInput.addEventListener("input", function () {
+    const value = emailInput.value;
+
+    if (value === "") {
+        emailInput.setCustomValidity("Email is required.");
+    }
+    else if (!value.includes("@")) {
+        emailInput.setCustomValidity(
+            "Please include an '@' in the email address. '" +
+            value + "' is missing an '@'."
+        );
+    }
+    else if (!value.endsWith("@gmail.com")) {
+        emailInput.setCustomValidity(
+            "Please enter a valid Gmail address (example@gmail.com)."
+        );
+    }
+    else {
+        emailInput.setCustomValidity("");
+    }
+
+    emailInput.reportValidity();
+});
+
+/* FORM SUBMIT ANIMATION */
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    submitBtn.classList.add("loading");
+    successMsg.style.display = "none";
+
+    const formData = new FormData(form);
+
+    fetch("http://localhost:8080/contact", {
+        method: "POST",
+        body: formData
+    })
+    .then(() => {
+        submitBtn.classList.remove("loading");
+        successMsg.style.display = "block";
+        successMsg.classList.add("show");
+        form.reset();
+    })
+    .catch(() => {
+        submitBtn.classList.remove("loading");
+        alert("Something went wrong. Please try again.");
+    });
+});
+</script>
+
+</body>
+</html>
+
+
+
